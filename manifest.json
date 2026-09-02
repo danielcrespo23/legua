@@ -1,0 +1,12 @@
+{
+  "name": "Legua",
+  "short_name": "Legua",
+  "description": "Plan de entreno para la legua del 24 de diciembre",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1EC",
+  "theme_color": "#14262B",
+  "lang": "es",
+  "icons": [{ "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }]
+}
