@@ -85,6 +85,20 @@ Herramientas: `strava_atleta`, `strava_actividades`, `strava_actividad`, `strava
 El endpoint es de solo lectura y sin estado (transporte Streamable HTTP, solo POST). Quien tenga la URL
 completa puede leer tus datos de Strava: no la compartas y cámbiala si hace falta cambiando `MCP_KEY`.
 
+### Probarlo sin Vercel (temporal, desde tu ordenador)
+
+`mcp/strava-http.js` sirve el mismo endpoint en `http://localhost:8788/api/mcp/CLAVE` usando el token local.
+Para que claude.ai llegue a él hay que publicar el puerto con un túnel:
+
+```
+winget install Cloudflare.cloudflared          (una vez)
+node mcp/strava-http.js                        (ventana 1: imprime la clave)
+cloudflared tunnel --url http://localhost:8788 (ventana 2: imprime una URL https://….trycloudflare.com)
+```
+
+URL del conector: `https://….trycloudflare.com/api/mcp/CLAVE`. Solo funciona con el ordenador encendido y las
+dos ventanas abiertas, y la URL del túnel cambia cada vez que lo arrancas.
+
 ## Backend para Strava y macros por IA (Vercel, gratis)
 
 1. Crea una app en https://www.strava.com/settings/api. En "Authorization Callback Domain" pon el dominio de Vercel (ej. `legua-api.vercel.app`).
