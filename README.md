@@ -1,20 +1,49 @@
 # Legua
 
-Plan de entreno para la legua del 24 de diciembre. PWA en un solo archivo (`index.html`) más un backend
+Plan de entreno para la legua (5,57 km) del 24 de diciembre. PWA sin dependencias, más un backend
 mínimo opcional en `api/` para Strava y macros con IA.
 
-## Qué hace sin backend
+## Cómo está organizada
 
-- Plan de 16 semanas en cuatro fases (base → umbral → específico → afinar), 3 carreras + gym + pádel.
-- Al empezar te pide tus valores de partida y te enseña de dónde partes y cuánto hay que recortar.
-- Cada semana sube o baja el volumen según lo que registres (esfuerzo y sesiones hechas).
-- Hora óptima de cada entreno a partir de tu horario de trabajo y otros compromisos.
-- Botón "+ Pádel" en cualquier día: el plan recoloca carreras y gym.
-- Comida recomendada antes y después de cada sesión.
-- Macros diarios objetivo y registro de alimentos con peso (lista de ~45 alimentos habituales).
-- Progreso: ritmo y pulso en rodajes suaves, km por semana.
-- Exportar la semana al Calendario del iPhone (.ics) con avisos 30 min antes y creatina diaria.
-- "Copiar resumen para Claude": pega el resumen en el chat y ajustamos el plan a mano.
+```
+index.html            estructura de la página y carga de scripts (en orden)
+css/app.css           estilos
+js/util.js            fechas, ritmos, escape de HTML, toast
+js/estado.js          estado por defecto, guardado en localStorage, migración desde la v1
+js/plan.js            motor del plan: fases, progresión de km, sesiones, gym, descansos, horas
+js/nutricion.js       alimentos, objetivos de macros según complexión, IA
+js/ui.js              componentes: chips, tarjetas de sesión, selectores, hojas modales
+js/vistas/            una vista por pestaña: onboarding, hoy, calendario, entreno, macros, metricas, ajustes
+js/integraciones.js   .ics para el Calendario, Strava, avisos, resumen para Claude
+js/acciones.js        qué hace cada botón (data-a="…")
+js/app.js             render principal y arranque
+sw.js                 caché para abrir sin conexión y avisos push
+api/                  funciones de Vercel (Strava, macros, push)
+```
+
+## Qué hace
+
+- **Al empezar** pide tu complexión (sexo, edad, altura, peso, nivel, pulso máximo si lo sabes), en
+  qué carrera del plan estás y de cuántos km, tus días de carrera y gym y tu horario de trabajo.
+  No pide objetivo de ritmo: los ritmos salen de tus rodajes registrados (o de tu nivel mientras no haya datos).
+- **Hoy**: lo que toca con explicación, ritmo, pulso, comida antes y después, y un vistazo a mañana.
+- **Calendario**: mes completo con carreras numeradas, gym, pádel y descansos. Tocas un día y ves el detalle,
+  añades pádel (el plan se recoloca) o exportas la semana al Calendario del iPhone (.ics con avisos).
+- **Entreno**: fase actual, resumen de la semana, próximas carreras numeradas, cómo progresa el plan,
+  ritmos y zonas, y las rutinas de gimnasio con ejercicios.
+- **Macros**: objetivo diario calculado con tu complexión (Mifflin-St Jeor) y el tipo de día; registro de
+  alimentos por peso o describiendo la comida (IA, necesita backend).
+- **Métricas**: ritmo y pulso en rodajes, km por semana, registros, y el sitio donde aparecerá Strava.
+- **Ajustes** (engranaje arriba): complexión, carrera y días, punto de partida del plan, horario, backend, copia de datos.
+
+### El plan
+
+- Fases por semanas hasta la carrera: base (≥12), umbral (11-7), específico (6-3), afinar (2-1), carrera.
+- 3 carreras por semana numeradas de forma continua desde el punto de partida. El rodaje base sube 0,5 km
+  por semana; si registras una semana con esfuerzo 8 o más se mantiene, si apenas corres baja.
+  Descarga del 20 % cada cuarta semana y tope de km por fase.
+- Gym A/B/C según fase. Nunca piernas el día antes de series, ni gym encima de series o pádel.
+  Los días sin nada quedan como descanso.
 
 ## Tenerla en el iPhone (5 minutos)
 
@@ -42,8 +71,8 @@ iOS solo manda push a PWAs instaladas en pantalla de inicio. Hace falta generar 
 del navegador en `PUSH_SUBSCRIPTION`. El cron de `vercel.json` envía un aviso a las 6:00 UTC.
 Para el día a día, el .ics con alarmas del Calendario es más fiable y no necesita nada de esto.
 
-## Siguiente versión (con Claude Code)
+## Pendiente
 
+- Métricas completas desde Strava (ritmo, pulso, cadencia, carga) cuando esté la API.
 - Que Claude revise cada domingo los registros y reescriba la semana (endpoint `/api/entrenador`).
 - Macros por foto del plato.
-- Pádel con hora, para no solapar con el gym.
