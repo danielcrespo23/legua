@@ -53,17 +53,37 @@ api/                  funciones de Vercel (Strava, macros, push)
 
 Los datos se guardan en el propio iPhone (localStorage). Exporta una copia desde Ajustes de vez en cuando.
 
-## Strava en Claude Code (MCP)
+## Strava en Claude (MCP)
 
-`mcp/strava-mcp.js` es un servidor MCP sin dependencias que deja a Claude Code leer tus métricas de Strava
-(actividades, parciales por km, pulso, cadencia, zonas, resumen semanal) para ajustar el plan.
+Las herramientas de Strava (actividades, parciales por km, pulso, cadencia, zonas, resumen semanal) están en
+`api/_strava-tools.js` y se sirven de dos formas:
 
-1. Crea una app en https://www.strava.com/settings/api con "Authorization Callback Domain" = `localhost`.
+- **En el ordenador, para Claude Code**: `mcp/strava-mcp.js`, por stdio, sin dependencias.
+- **En el móvil o la web, para la app de Claude**: `api/mcp/[key].js`, un servidor MCP remoto en Vercel.
+
+Herramientas: `strava_atleta`, `strava_actividades`, `strava_actividad`, `strava_zonas`, `strava_streams`, `strava_semanas`.
+
+### Claude Code (ordenador)
+
+1. Crea una app en https://www.strava.com/settings/api. En "Authorization Callback Domain" pon el dominio
+   de Vercel si vas a usar también el conector remoto (ej. `legua-api.vercel.app`); si no, `localhost`.
+   Strava acepta siempre `localhost` además del dominio configurado.
 2. Autoriza una vez: `node mcp/strava-auth.js CLIENT_ID CLIENT_SECRET`. Se abre Strava, aceptas y el token
    queda en `mcp/strava-token.json` (ignorado por git).
 3. El archivo `.mcp.json` de la carpeta padre registra el servidor. Reinicia Claude Code y acepta el servidor
-   `strava` cuando lo pregunte. Herramientas: `strava_atleta`, `strava_actividades`, `strava_actividad`,
-   `strava_zonas`, `strava_streams`, `strava_semanas`.
+   `strava` cuando lo pregunte.
+
+### App de Claude en el móvil (conector remoto)
+
+1. Despliega este repo en Vercel (ver sección siguiente) con estas variables: `STRAVA_CLIENT_ID`,
+   `STRAVA_CLIENT_SECRET`, `STRAVA_REFRESH_TOKEN` (cópialo de `mcp/strava-token.json`) y `MCP_KEY`
+   (una cadena larga y aleatoria: `node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`).
+2. En claude.ai → Ajustes → Conectores → "Añadir conector personalizado": nombre `Strava`,
+   URL `https://TU-BACKEND.vercel.app/api/mcp/MCP_KEY`. Sin OAuth: la clave va en la URL.
+3. En la app del móvil, en un chat, activa el conector Strava en el menú de herramientas y pregunta.
+
+El endpoint es de solo lectura y sin estado (transporte Streamable HTTP, solo POST). Quien tenga la URL
+completa puede leer tus datos de Strava: no la compartas y cámbiala si hace falta cambiando `MCP_KEY`.
 
 ## Backend para Strava y macros por IA (Vercel, gratis)
 
