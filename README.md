@@ -53,6 +53,18 @@ api/                  funciones de Vercel (Strava, macros, push)
 
 Los datos se guardan en el propio iPhone (localStorage). Exporta una copia desde Ajustes de vez en cuando.
 
+## Strava en Claude Code (MCP)
+
+`mcp/strava-mcp.js` es un servidor MCP sin dependencias que deja a Claude Code leer tus métricas de Strava
+(actividades, parciales por km, pulso, cadencia, zonas, resumen semanal) para ajustar el plan.
+
+1. Crea una app en https://www.strava.com/settings/api con "Authorization Callback Domain" = `localhost`.
+2. Autoriza una vez: `node mcp/strava-auth.js CLIENT_ID CLIENT_SECRET`. Se abre Strava, aceptas y el token
+   queda en `mcp/strava-token.json` (ignorado por git).
+3. El archivo `.mcp.json` de la carpeta padre registra el servidor. Reinicia Claude Code y acepta el servidor
+   `strava` cuando lo pregunte. Herramientas: `strava_atleta`, `strava_actividades`, `strava_actividad`,
+   `strava_zonas`, `strava_streams`, `strava_semanas`.
+
 ## Backend para Strava y macros por IA (Vercel, gratis)
 
 1. Crea una app en https://www.strava.com/settings/api. En "Authorization Callback Domain" pon el dominio de Vercel (ej. `legua-api.vercel.app`).
